@@ -4,8 +4,10 @@
 For release 0.1:
 - [ ] init pos
 - [ ] init vel
+  - uniform distribution
 - [ ] velocity verlet
 - [ ] forces
 - [ ] dumping of the file
   - xyz format
   - command
+  - test
