@@ -1,1 +1,11 @@
 # This is a README
+
+# What to do
+For release 0.1:
+- [ ] init pos
+- [ ] init vel
+- [ ] velocity verlet
+- [ ] forces
+- [ ] dumping of the file
+  - xyz format
+  - command
