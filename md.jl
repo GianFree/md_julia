@@ -20,7 +20,7 @@ It returns:
 xt
 vt
 """
-function verlet_step( x0, v0, F, Fargs; m = 1 )
+function verlet_step( x0, v0, F, Fargs; m = 1, dt=0.001 )
 
     v_dt2 = v0 + 0.5 * F(x0, Fargs...)/m * dt
     x_dt  = x0 + v_dt2 * dt
@@ -36,20 +36,34 @@ function verlet_step( x0, v0, F, Fargs; m = 1 )
     return x_dt, v_dt
 end
 
+function main()
+    # particle position
+    xt = 0.
+    # particle velocity
+    vt = 5. #arb units
+    # Force variable
+    x_ref = 0
+    k = 4
 
-# particle position
-xt = 0.
-# particle velocity
-vt = 5. #arb units
-# Force variable
-x_ref = 0
-k = 4
+    positions = []
+    velocities = []
+    # Iteration
+    for ts in 1:10
+        xt, vt = verlet_step(xt, vt, ho, (x_ref, k))
+        append!( positions, xt )
+        append!( velocities, vt )
+    end
 
-positions = []
-velocities = []
-# Iteration
-for ts in 1:10
-    xt, vt = verlet_step(xt, vt, ho, (x_ref, k))
-    append!( positions, xt )
-    append!( velocities, vt )
+    return positions, velocities
+end
+
+xx, vv = main()
+println(xx)
+
+#=
+using Pkg
+Pkg.
+=#
+using Plots
+plot(xx)
 # dumping the traj
