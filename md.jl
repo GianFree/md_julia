@@ -1,8 +1,10 @@
+using Plots
+
 # forces
-"""Toy model, harmonic potential
+"""Toy model, FORCE due to harmonic potential
 """
 function ho( x, x_ref, k )
-    return -k/2 * ( x - x_ref )^2
+    return -k * ( x - x_ref )
 end
 
 # velocity verlet
@@ -20,19 +22,13 @@ It returns:
 xt
 vt
 """
-function verlet_step( x0, v0, F, Fargs; m = 1, dt=0.001 )
+function verlet_step( x0, v0, F, Fargs; m = 1, dt=0.01 )
 
     v_dt2 = v0 + 0.5 * F(x0, Fargs...)/m * dt
     x_dt  = x0 + v_dt2 * dt
     a_dt  = F(x_dt, Fargs...) / m
     v_dt  = v_dt2 + 0.5 * a_dt * dt
 
-    #=
-    v(t) -> v(t+dt/2) = v(t) + 1/2. a(t) * dt
-    x(t) -> x(t+dt) = x(t) + v(t+dt/2)*dt
-    a(t+dt) = F(t+dt)/m
-    v(t+dt) = v(t+dt/2)+1/2 a(t+dt)dt
-    =#
     return x_dt, v_dt
 end
 
@@ -40,16 +36,16 @@ function main()
     # particle position
     xt = 0.
     # particle velocity
-    vt = 5. #arb units
+    vt = 5 #arb units
     # Force variable
-    x_ref = 0
-    k = 4
+    x_ref = 0.
+    k = 5
 
-    positions = []
-    velocities = []
+    positions = Float64[]
+    velocities = Float64[]
     # Iteration
-    for ts in 1:10
-        xt, vt = verlet_step(xt, vt, ho, (x_ref, k))
+    for ts in 1:1000
+        xt, vt = verlet_step( xt, vt, ho, (x_ref, k) )
         append!( positions, xt )
         append!( velocities, vt )
     end
@@ -58,12 +54,7 @@ function main()
 end
 
 xx, vv = main()
-println(xx)
-
-#=
-using Pkg
-Pkg.
-=#
-using Plots
 plot(xx)
+
+
 # dumping the traj
