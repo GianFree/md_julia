@@ -2,9 +2,10 @@
 
 # What to do
 For release 0.1:
-- [ ] init pos
-- [ ] init vel
-  - uniform distribution
+- [ ] init positions
+  - 1 particles
+- [ ] init velicity
+  - #uniform distribution
 - [ ] velocity verlet
 - [ ] forces
 - [ ] dumping of the file
