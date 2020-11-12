@@ -2,13 +2,13 @@
 
 # What to do
 For release 0.1:
-- [ ] init positions
+- [x] init positions
   - 1 particles
 - [ ] init velicity
   - #uniform distribution
-- [ ] velocity verlet
+- [x] velocity verlet
 - [ ] forces
-- [ ] dumping of the file
+- [x] dumping of the file
   - xyz format
   - command
   - test
