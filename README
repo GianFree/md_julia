@@ -3,16 +3,25 @@
 # What to do
 For release 0.1:
 - [ ] init positions
-  - [x] 1 particles
+  - [x] 1 particle
+  - [x] 2 particles
+  - [ ] visualising potential
+  - [ ] creation of lattice
+  - [ ] N=100
 - [ ] init velicity
   - [x] same velocity
+  - [ ] randomly uniform velocities
   - [ ] MB distribution
 - [x] velocity verlet
-- [ ] forces
+- [x] forces
   - [x] ho trap
-  - [ ] lj forces
-  - [ ] combining forces
+  - [x] lj forces
+  - [x] combining forces
+- [ ] Bussi thermostat
+  - [ ] random generator
+  - [ ] v-rescale algorithm
 - [x] dumping of the file
   - [x] xyz format
+
 
 - test
