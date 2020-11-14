@@ -5,18 +5,24 @@ using LinearAlgebra
 """Toy model, FORCE due to harmonic potential
 """
 function f_ho( x, x_ref, k )
-    return -k .* ( x - x_ref )
+    return -k * ( x - x_ref )
 end
 
-"""Return """
+"""Take as input the position matrix of the particles.
+It returns the NxNx3 LJ force tensorm where N is the number
+of particles."""
 function f_lj( x; ε=1, σ=1 )
     nparticles = size(x)[1]
     f_ij = zeros((nparticles, nparticles, 3))
     for i in 1:nparticles
+        Xi = x[i, :]
         for j in i+1:nparticles
-            Rij = x[i, :] - x[j, :]
+            # This is a vector
+            Rij = Xi - x[j, :]
             rij = norm(Rij)
-            f_ij[i,j,:] = 48 * ε / rij^2 * ( (σ/rij)^12 - 0.5 * (σ/rij)^6 ) * Rij
+            tmp = 48*ε / rij^2 * ( (σ/rij)^12 - 0.5 * (σ/rij)^6 ) * Rij
+            f_ij[i,j,:] = tmp
+            f_ij[j,i,:] = -tmp
         end
     end
     return f_ij
@@ -38,26 +44,26 @@ xt
 vt
 """
 function verlet_step( x0, v0, F, Fargs; m = 1, dt=0.01 )
-
     v_dt2 = v0 + 0.5 * F.(x0, Fargs...)/m * dt
     x_dt  = x0 + v_dt2 * dt
     a_dt  = F.(x_dt, Fargs...) / m
     v_dt  = v_dt2 + 0.5 * a_dt * dt
-
     return x_dt, v_dt
 end
 
-function force_matrix( x, Fargs)
-    matrix_force = ones((2,2,3))
-    #return a matrix NxNx3
-    return matrix_force
+function force( x, fargs )
+    ε     = fargs[1]
+    σ     = fargs[2]
+    x_ref = fargs[3]
+    k     = fargs[4]
+
+    nparticles = size(x)[1]
+    flj = reshape( sum(f_lj(x,ε=ε,σ=σ), dims=2), (nparticles,3) )
+    fho = f_ho(x, x_ref, k )
+    return fho + flj
 end
 
-function force( x, f_matrix )
-    return [ 1 0.0 0; -1 0. 0. ]
-end
-
-function update_step( x0, v0; m = 1, dt=0.01 )
+function update_step( x0, v0, fargs; m = 1, dt=0.01 )
     #x0 is a Nx3 matrix
     #v0 is a Nx3 matrix
     #Fargs is a tuple
@@ -66,29 +72,28 @@ function update_step( x0, v0; m = 1, dt=0.01 )
 
     # forza su particella 1:
     # risultante= np.sum(force[i, :])
-
-    v_dt2 = v0 + 0.5 * force(x0)/m * dt
+    v_dt2 = v0 + 0.5 * force(x0, fargs)/m * dt
     x_dt  = x0 + v_dt2 * dt
-    a_dt  = force(x_dt) / m
+    a_dt  = force(x_dt, fargs) / m
     v_dt  = v_dt2 + 0.5 * a_dt * dt
-
     return x_dt, v_dt
 end
 
 function main()
     # particle position
-    xt    = [0.0 0.0 0.0; 0.0 0.0 0.0]
+    xt    = [1 0.0 0.0; -1 0.0 0.0]
     # particle velocity
-    vt    = [0.0 0.0 0.0; 0.0 0.0 0.0] #arb units
+    vt    = [0.5 0.5 0.0; 0.0 -0.5 0.0] #arb units
     # Force variable
-    x_ref = [0.0, 0.0, 0.0]
-    k     = [10, 10.0, 0.0]
+    x_ref = [0.0 0.0 0.0; 0.0 0.0 0.0]
+    k     = 1
+    # force
+    fargs = [ 1, 2, x_ref, k ]
+
     nparticles = 2
 
     positions  = xt
     velocities = vt
-
-    println(f_lj([1 1 1; 3 3 3]))
 
     # Iteration
     io = open("traj.xyz", "w")
@@ -98,7 +103,7 @@ function main()
             println(io, "SCIAO GARI")
         end
 
-        xt, vt = update_step( xt, vt )
+        xt, vt = update_step( xt, vt, fargs )
         #for p in 1:nparticles
         #xt[p,:], vt[p,:] = verlet_step( xt[p,:], vt[p,:], f_ho, (x_ref, k) )
         #positions = cat(positions, xt, dims=2)
@@ -117,16 +122,16 @@ function main()
     return transpose(positions), transpose(velocities)
 end
 
-xx,vv = main()
+xx,vv= main()
 
 #plot(xx[1],)
-plot(xx[:,1], xx[:,2], )
+#plot(xx[:,1], xx[:,2], )
 # plot(xx[2])
 
 #
-# lj(r) = 4 * (-1/r^6 + 1/r^12)
-# r = 0.95:0.01:5
-# plot(r, lj.(r))
+lj(r) = 4 * (-1/r^6 + 1/r^12)
+r = 0.95:0.01:5
+plot(r, lj.(r))
 
 #println( ho.( [1,2,3], [0,0,0], 3  ) )
 # dumping the traj
